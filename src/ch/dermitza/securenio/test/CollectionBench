@@ -1,0 +1,11 @@
+##### ADD
+ArrayDeque Took 1.39609204ms to create and add 10000 timeouts over 100 trials
+PriorityQueue Took 1.80583455ms to create and add 10000 timeouts over 100 trials
+ArrayList Took 1.35187603ms to create and add 10000 timeouts over 100 trials
+LinkedList Took 9.91288649ms to create and add 10000 timeouts over 100 trials
+HashMap Took 11.93441122ms to create and add 10000 timeouts over 100 trials
+HashSet Took 11.19968206ms to create and add 10000 timeouts over 100 trials
+##### REMOVE
+ArrayDeque Took 1162.3895109999999ms to remove 10000 timeouts over 10 trials
+HashMap Took 0.60821714ms to remove 10000 timeouts over 100 trials
+HashSet Took 0.57814016ms to remove 10000 timeouts over 100 trials

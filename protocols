@@ -1,0 +1,4 @@
+# Enabled protocols
+
+SSLv3
+TLSv1.2
