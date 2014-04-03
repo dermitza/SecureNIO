@@ -43,7 +43,7 @@ Sample server and client KeyStores and TrustStores have been provided and are re
 ```
 keytool -genkey -keyalg RSA -alias server -keystore server.jks -storepass server -validity 360 -keysize 2048
 ```
-2. Extract the �public key� from the �public-private� key pair that you created
+2. Extract the public key from the public-private key pair that you created
 ```
 keytool -export -alias server -keystore server.jks -rfc -file serverPublic.cert
 ```
