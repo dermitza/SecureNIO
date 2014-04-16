@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>SecureNIO by dermitza</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/dermitza/SecureNIO">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/dermitza/SecureNIO/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/dermitza/SecureNIO/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>SecureNIO</h1>
+          <p>A minimal, non-blocking Java NIO TCP framework supporting SSL/TLS</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/dermitza">dermitza</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="-securenioa-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries" class="anchor" href="#-securenioa-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries"><span class="octicon octicon-link"></span></a><h1 align="center">
+<a name="-securenioa-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries-1" class="anchor" href="#-securenioa-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries-1"><span class="octicon octicon-link"></span></a><img src="https://github.com/dermitza/SecureNIO/raw/master/SecureNIO.png" alt="SecureNIO"> SecureNIO<h1></h1>
+
+<h2>
+<a name="a-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries" class="anchor" href="#a-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries"><span class="octicon octicon-link"></span></a><h2 align="center">
+<a name="a-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries-1" class="anchor" href="#a-minimal-non-blocking-java-nio-tcp-framework-supporting-ssltlsfeaturesnon-blocking---exclusivelyminimal---compiled-jar-is-121kb-small-only-the-essentials-are-includedscalable---supporting-thousands-of-concurrent-sockets-optimized-for-small-data-size-short-lived-communicationsmall-memory-footprint---server-memory-usage-10mb-idle-200mb-for-1000-concurrent-two-way-ssltls-clientssimple---implement-your-custom-packets-extending-a-single-interface-and-override-two-simple-methods-to-get-startedwell-documented---lolextensible---custom-packets-and-packet-workers-supportedssltls-support---supports-both-ssltls-encrypted-and-non-encrypted-socketchannelsone-or-two-way-ssltls-authentication---you-decideconfigurable-ssltls-protocols-supported---via-text-fileconfigurable-cipher-suites-supported---via-text-fileauto-scaling-packet-buffers---never-miss-another-application-packetvariable-length-packets---variable-length-application-packets-are-supportedsupports-timeouts---timeouts-are-internally-used-to-disconnect-expired-ssl-sessions-but-can-also-be-used-extrinsically-eg-to-disconnect-from-a-remote-peer-to-re-validate-an-ssl-handshake-and-so-onchangesv019fixed-an-error-where-the-sslengine-may-fail-with-illegalstateexception-in-some-cases-when-receiving-unexpected-kinds-of-ssl-records-after-being-closedfixed-an-error-where-if-the-so_sndbuf-was-full-the-selector-would-hang-as-we-do-not-re-register-for-writes-as-such-flushing-is-now-blocking-until-all-data-has-been-written-to-the-socketimplemented-partial-loggingread-static-variables-from-properties-on-diskadditional-support-classesadditional-javadoc-yayv018---first-released-versionbinaries-1"><span class="octicon octicon-link"></span></a>A minimal, non-blocking, Java NIO TCP framework supporting SSL/TLS<h2></h2>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>
+<em>Non-blocking -</em> Exclusively.</li>
+<li>
+<em>Minimal -</em> Compiled .jar is 121KB small, only the essentials are included.</li>
+<li>
+<em>Scalable -</em> Supporting thousands of concurrent sockets, optimized for small data-size, short-lived communication.</li>
+<li>
+<em>Small memory footprint -</em> Server memory usage: ~10MB idle, ~200MB for 1000 concurrent two-way SSL/TLS clients.</li>
+<li>
+<em>Simple -</em> Implement your custom packets extending a single interface, and override two simple methods to get started.</li>
+<li>
+<em>Well-documented -</em> LOL</li>
+<li>
+<em>Extensible -</em> Custom packets and packet workers supported.</li>
+<li>
+<em>SSL/TLS support -</em> Supports both SSL/TLS encrypted and non-encrypted SocketChannels</li>
+<li>
+<em>One or two-way SSL/TLS authentication -</em> You decide.</li>
+<li>
+<em>Configurable SSL/TLS protocols supported -</em> via text file.</li>
+<li>
+<em>Configurable cipher suites supported -</em> via text file.</li>
+<li>
+<em>Auto-scaling packet buffers -</em> Never miss another application packet.</li>
+<li>
+<em>Variable length packets -</em> Variable length application packets are supported.</li>
+<li>
+<em>Supports timeouts -</em> Timeouts are internally used to disconnect expired SSL sessions, but can also be used extrinsically (e.g. to disconnect from a remote peer, to re-validate an SSL handshake and so on).</li>
+</ul>
+<h2>
+<a name="changes" class="anchor" href="#changes"><span class="octicon octicon-link"></span></a>Changes</h2>
+
+<ul>
+<li>
+<em>v0.19</em>
+
+<ul>
+<li>Fixed an error where the SSLEngine may fail with IllegalStateException in some cases when receiving unexpected kinds of SSL records after being closed</li>
+<li>Fixed an error where if the SO_SNDBUF was full the selector would hang as we do not (re-)register for writes. As such, flushing() is now blocking until all data has been written to the socket</li>
+<li>Implemented (partial) logging</li>
+<li>Read static variables from properties on disk</li>
+<li>Additional support classes</li>
+<li>Additional javadoc (yay)</li>
+</ul>
+</li>
+<li>
+<em>v0.18 -</em> First released version</li>
+</ul>
+<h2>
+<a name="binaries" class="anchor" href="#binaries"><span class="octicon octicon-link"></span></a>Binaries</h2>
+
+</h2>
+</h2>
+</h1>
+</h1><p>All binaries are compiled using Java 1.7.0_09; Java HotSpot(TM) 64-Bit Server VM 23.5-b02 unless otherwise noted.</p>
+
+<ul>
+<li>
+<em>Version 0.19 -</em> <a href="https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19.jar">SecureNIO_v0.19.jar</a>  <a href="https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19_doc.zip">SecureNIO_v0.19_doc.zip</a>
+</li>
+<li>
+<em>Version 0.18 -</em> <a href="https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19.jar">SecureNIO_v0.18.jar</a>  <a href="https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.18_doc.zip">SecureNIO_v0.18_doc.zip</a>
+</li>
+</ul><h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<h3>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<p>Two examples on how to use this framework are provided, each in their respective packages:</p>
+
+<ul>
+<li>
+<em>ch.dermitza.securenio.test.singlebyte -</em> A simple, one byte long application packet client/server implementation</li>
+<li>
+<em>ch.dermitza.securenio.test.variablebyte -</em> A simple, variable byte application packet client/server implementation</li>
+</ul><h3>
+<a name="generating-self-signed-keystores-public-and-private-keys-and-truststores-public-keys" class="anchor" href="#generating-self-signed-keystores-public-and-private-keys-and-truststores-public-keys"><span class="octicon octicon-link"></span></a>Generating self-signed KeyStores (public and private keys) and TrustStores (public keys)</h3>
+
+<p>Sample server and client KeyStores and TrustStores have been provided and are ready to use. Needless to say, <strong>do not use these for anything other than testing</strong>. Steps to create a self-signed KeyStore (and certificates) and TrustStore for a server implementation:</p>
+
+<ol>
+<li>Generate a server KeyStore</li>
+</ol><pre><code>keytool -genkey -keyalg RSA -alias server -keystore server.jks -storepass server -validity 360 -keysize 2048
+</code></pre>
+
+<ol>
+<li>Extract the public key from the public-private key pair that you created</li>
+</ol><pre><code>keytool -export -alias server -keystore server.jks -rfc -file serverPublic.cert
+</code></pre>
+
+<ol>
+<li>Create the truststore using the public key (advised to use a different password, e.g. serverPublic)</li>
+</ol><pre><code>keytool -import -alias server -file serverPublic.cert -keystore serverPublic.jks -storetype JKS
+</code></pre>
+
+<p>You can now use the serverPublic.jks in your clients to authenticate the server. To generate a KeyStore and/or TrustStore for the client (two-way authentication), repeat the above steps using appropriate names (i.e. replace server with client where appropriate).</p>
+
+<h3>
+<a name="javadoc" class="anchor" href="#javadoc"><span class="octicon octicon-link"></span></a>JavaDoc</h3>
+
+<p>You can currently browse the JavaDoc through the zipped version provided above. Additional documentation (sometimes extensive) is included in the source files.</p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>GNU AFFERO GENERAL PUBLIC LICENSE Version 3</p>
+
+<p>Copyright (C) 2014 K. Dermitzakis <a href="mailto:dermitza@gmail.com">dermitza@gmail.com</a></p>
+
+<p>SecureNIO is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+
+<p>SecureNIO is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU Affero General Public License along with SecureNIO. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-28803915-10");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
