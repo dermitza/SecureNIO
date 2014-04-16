@@ -20,10 +20,14 @@ package ch.dermitza.securenio.packet.worker;
 import ch.dermitza.securenio.packet.PacketIF;
 import ch.dermitza.securenio.packet.PacketListener;
 import ch.dermitza.securenio.socket.SocketIF;
+import ch.dermitza.securenio.util.PropertiesReader;
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An abstract, extensible implementation of a Packet Worker. This thread waits
@@ -35,14 +39,12 @@ import java.util.HashMap;
  * data on that socket arrives.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public abstract class AbstractPacketWorker implements Runnable {
 
-    /**
-     * The default buffer size (in bytes) per socket
-     */
-    public static final int BUFFER_SIZE = 512;
+    private final Logger logger = LoggerHandler.getLogger(AbstractPacketWorker.class.getName());
     private final ArrayList<PacketListener> listeners = new ArrayList<>();
     /**
      * Maps a SocketChannel to a list of ByteBuffer instances
@@ -82,7 +84,7 @@ public abstract class AbstractPacketWorker implements Runnable {
                 if (buffer == null) {
                     // allocate a large enough buffer to hold the data we
                     // just received
-                    int size = (count > BUFFER_SIZE) ? count : BUFFER_SIZE;
+                    int size = (count > PropertiesReader.getPacketBufSize()) ? count : PropertiesReader.getPacketBufSize();
                     buffer = ByteBuffer.allocate(size);
                     this.pendingData.put(socket, buffer);
                 }
@@ -90,8 +92,10 @@ public abstract class AbstractPacketWorker implements Runnable {
 
                 if (count > buffer.remaining()) {
                     int diff = count - buffer.remaining();
-                    //System.out.println("Buffer needs resizing, remaining " + buffer.remaining() + " needed " + count + " difference " + diff);
-                    //System.out.println("old size: " + buffer.capacity());
+                    logger.log(Level.CONFIG, "Buffer needs resizing, remaining{0}"
+                            + "needed {1} difference {2}",
+                            new Object[]{buffer.remaining(), count, diff});
+                    logger.log(Level.FINEST, "old size: {0}", buffer.capacity());
                     // Allocate a new buffer. To minimize new buffer allocation,
                     // we resize the buffer appropriately, in case this is a
                     // *really* busy channel. Notes: If it is an extremely busy
@@ -101,12 +105,15 @@ public abstract class AbstractPacketWorker implements Runnable {
                     // growing buffer can also indicate that the underlying
                     // data is never or wrongly processed, that can indicate a
                     // problem with the end application.
-                    int extSize = (diff > BUFFER_SIZE) ? diff : BUFFER_SIZE;
+                    int extSize = (diff > PropertiesReader.getPacketBufSize())
+                            ? diff : PropertiesReader.getPacketBufSize();
                     ByteBuffer temp = ByteBuffer.allocate(buffer.capacity() + extSize);
-                    //System.out.println("new size: " + temp.capacity());
+                    logger.log(Level.FINEST, "new size: {0}", temp.capacity());
                     // Flip existing buffer to prepare for putting in the replacement
                     buffer.flip();
-                    //System.out.println("pos " + buffer.position() + " lim " + buffer.limit() + " cap " + buffer.capacity());
+                    logger.log(Level.FINEST, "pos {0} lim {1} cap {2}",
+                            new Object[]{buffer.position(), buffer.limit(),
+                                buffer.capacity()});
                     // put existing buffer into the temporary replacement
                     temp.put(buffer);
                     // Remove the old reference
@@ -120,7 +127,9 @@ public abstract class AbstractPacketWorker implements Runnable {
                 }
                 // Make a copy of the data
                 buffer.put(tempArray);
-                //System.out.println("pos " + buffer.position() + " lim " + buffer.limit() + " cap " + buffer.capacity());
+                logger.log(Level.FINEST, "pos {0} lim {1} cap {2}",
+                        new Object[]{buffer.position(), buffer.limit(),
+                            buffer.capacity()});
             }
             pendingSockets.notify();
         }
@@ -143,7 +152,7 @@ public abstract class AbstractPacketWorker implements Runnable {
     @Override
     public void run() {
         running = true;
-        //System.out.println("PacketWorker running");
+        logger.config("Initializing...");
 
         runLoop:
         while (running) {
@@ -206,6 +215,7 @@ public abstract class AbstractPacketWorker implements Runnable {
      * all listener references.
      */
     private void shutdown() {
+        logger.config("Shutting down...");
         // Clear the queue
         pendingData.clear();
         pendingSockets.clear();

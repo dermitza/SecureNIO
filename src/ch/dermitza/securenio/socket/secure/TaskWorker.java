@@ -17,7 +17,9 @@
  */
 package ch.dermitza.securenio.socket.secure;
 
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.util.ArrayDeque;
+import java.util.logging.Logger;
 
 /**
  * A threaded implementation of a worker processing tasks required by an
@@ -29,10 +31,12 @@ import java.util.ArrayDeque;
  * method.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class TaskWorker implements Runnable {
 
+    private static final Logger logger = LoggerHandler.getLogger(TaskWorker.class.getName());
     private final ArrayDeque<SecureSocket> queue = new ArrayDeque<>();
     //private final ArrayList<TaskListener> listeners = new ArrayList<>();
     private boolean running = false;
@@ -75,6 +79,7 @@ public class TaskWorker implements Runnable {
      */
     @Override
     public void run() {
+        logger.config("Initializing...");
         running = true;
         SecureSocket socket;
         runLoop:
@@ -143,6 +148,7 @@ public class TaskWorker implements Runnable {
      * asked to shutdown; it cleanly process the shutdown procedure.
      */
     private void shutdown() {
+        logger.config("Shutting down...");
         // Clear the queue
         queue.clear();
         // Remove all listener references

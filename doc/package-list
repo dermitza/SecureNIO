@@ -11,3 +11,4 @@ ch.dermitza.securenio.test
 ch.dermitza.securenio.test.singlebyte
 ch.dermitza.securenio.test.variablebyte
 ch.dermitza.securenio.util
+ch.dermitza.securenio.util.logging

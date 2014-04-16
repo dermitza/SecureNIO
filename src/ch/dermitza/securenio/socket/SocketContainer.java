@@ -29,7 +29,8 @@ import java.util.HashMap;
  * <p> This implementation is synchronized and thread-safe.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class SocketContainer {
 
@@ -78,7 +79,7 @@ public class SocketContainer {
      */
     public synchronized void addSocket(SelectableChannel key, SocketIF socket) {
         sockets.put(key, socket);
-        System.out.println("Sockets: " + size());
+        //System.out.println("Sockets: " + size());
     }
 
     /**
@@ -92,7 +93,7 @@ public class SocketContainer {
      * {@link SelectableChannel}.
      */
     public synchronized SocketIF removeSocket(SelectableChannel key) {
-        System.out.println("Sockets: " + (size() - 1));
+        //System.out.println("Sockets: " + (size() - 1));
         return sockets.remove(key);
     }
 

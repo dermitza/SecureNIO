@@ -23,7 +23,8 @@ import java.nio.charset.Charset;
 /**
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class TestPacketOne extends AbstractTestPacket implements TestPacketIF {
 
@@ -57,9 +58,9 @@ public class TestPacketOne extends AbstractTestPacket implements TestPacketIF {
         this.floatValue = Float.intBitsToFloat(intBits);
         int stringLen = bytes[13]; // String can be up to 128 single-byte characters;
         this.stringValue = new String(bytes, 14, stringLen, Charset.forName("UTF-8"));
-        System.out.println("Length: " + bytes.length + " bytes, longValue: "
-                + longValue + " byteValue: " + byteValue + " floatValue: "
-                + floatValue + " stringValue: " + stringValue);
+        //System.out.println("Length: " + bytes.length + " bytes, longValue: "
+        //        + longValue + " byteValue: " + byteValue + " floatValue: "
+        //        + floatValue + " stringValue: " + stringValue);
     }
 
     @Override
@@ -88,7 +89,7 @@ public class TestPacketOne extends AbstractTestPacket implements TestPacketIF {
         bytes[15] = (byte) (intBits);
         bytes[16] = (byte) this.stringValue.getBytes(Charset.forName("UTF-8")).length;
         System.arraycopy(stringValue.getBytes(Charset.forName("UTF-8")), 0, bytes, 17, bytes[16]);
-        
+        //System.out.println("Length " + length);
         return ByteBuffer.wrap(bytes);
     }
 

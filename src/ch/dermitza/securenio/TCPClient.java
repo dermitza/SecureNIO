@@ -22,11 +22,14 @@ import ch.dermitza.securenio.packet.worker.AbstractPacketWorker;
 import ch.dermitza.securenio.socket.PlainSocket;
 import ch.dermitza.securenio.socket.SocketIF;
 import ch.dermitza.securenio.socket.secure.SecureSocket;
+import ch.dermitza.securenio.util.PropertiesReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
 import javax.net.ssl.SSLEngine;
 
 /**
@@ -35,7 +38,8 @@ import javax.net.ssl.SSLEngine;
  * {@link SecureSocket}s.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class TCPClient extends AbstractSelector {
 
@@ -49,16 +53,13 @@ public class TCPClient extends AbstractSelector {
      * @param port The port to connect to
      * @param packetWorker The instance of packet worker to use
      * @param usingSSL Whether we are using SSL/TLS
-     * @param singleThreaded Whether or not the {@link SSLEngine} tasks should
-     * run on the same thread or on the
-     * {@link ch.dermitza.securenio.socket.secure.TaskWorker} thread.
      * @param needClientAuth Whether this client should also authenticate with
      * the server.
      */
     public TCPClient(InetAddress address, int port,
             AbstractPacketWorker packetWorker, boolean usingSSL,
-            boolean singleThreaded, boolean needClientAuth) {
-        super(address, port, packetWorker, usingSSL, singleThreaded, true,
+            boolean needClientAuth) {
+        super(address, port, packetWorker, usingSSL, true,
                 needClientAuth);
     }
 
@@ -114,10 +115,11 @@ public class TCPClient extends AbstractSelector {
         // an interest in connection events. These are raised when a channel
         // is ready to complete connection establishment.
         channel.register(selector, SelectionKey.OP_CONNECT);
-
-        // TODO CHECK THIS
-        channel.socket().setSendBufferSize(512);
-        channel.socket().setReceiveBufferSize(512);
+        channel.setOption(StandardSocketOptions.SO_SNDBUF, PropertiesReader.getSoSndBuf());
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, PropertiesReader.getSoRcvBuf());
+        channel.setOption(StandardSocketOptions.SO_KEEPALIVE, PropertiesReader.getKeepAlive());
+        channel.setOption(StandardSocketOptions.SO_REUSEADDR, PropertiesReader.getReuseAddress());
+        channel.setOption(StandardSocketOptions.IP_TOS, PropertiesReader.getIPTos());
 
         // now wrap the channel
         if (usingSSL) {
@@ -166,14 +168,17 @@ public class TCPClient extends AbstractSelector {
         // Finish the connection. If the connection operation failed
         // this will raise an IOException.
         try {
+            // TCP_NODELAY should be called after we are ready to connect,
+            // otherwise the socket does not recognize the option.
+            sc.getSocket().setOption(StandardSocketOptions.TCP_NODELAY, PropertiesReader.getTCPNoDelay());
             sc.finishConnect();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Cancel the channel's registration with our selector
             // since it faled to connect. At this point, there is no
             // reason to keep the client running. Perhaps we can issue
             // a reconnection attempt at a later stage, TODO.
             setRunning(false);
-            System.out.println(e);
+            logger.log(Level.SEVERE, "IOE at finishConnect(), shutting down", ioe);
             key.cancel();
             return;
         }

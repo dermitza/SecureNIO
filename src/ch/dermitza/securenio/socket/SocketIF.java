@@ -38,11 +38,12 @@ import java.nio.channels.SocketChannel;
  * a {@link Selector}.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  *
  */
 public interface SocketIF {
-
+    
     /**
      * Returns the underlying {@link SocketChannel}. This is done in order to
      * register the current socket with a {@link Selector}, as only the

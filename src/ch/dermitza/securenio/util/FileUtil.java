@@ -31,7 +31,10 @@ import java.util.ArrayList;
  * files do not exist or are incorrect
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
+ * @deprecated Replaced with the more functional and generic
+ * {@link PropertiesReader}. Do *NOT* use this class.
  */
 public class FileUtil {
 
@@ -116,15 +119,15 @@ public class FileUtil {
         return ret;
     }
 
-    public static void main(String[] args) {
-        String[] test = readProtocols("protocols");
-        for (int i = 0; i < test.length; i++) {
-            System.out.println(test[i]);
-        }
-        System.out.println(lines == null);
-        test = readCipherSuites("cipherSuites");
-        for (int i = 0; i < test.length; i++) {
-            System.out.println(test[i]);
-        }
-    }
+    //public static void main(String[] args) {
+    //    String[] test = readProtocols("protocols");
+    //    for (int i = 0; i < test.length; i++) {
+    //        System.out.println(test[i]);
+    //    }
+    //   System.out.println(lines == null);
+    //    test = readCipherSuites("cipherSuites");
+    //    for (int i = 0; i < test.length; i++) {
+    //        System.out.println(test[i]);
+    //    }
+    //}
 }

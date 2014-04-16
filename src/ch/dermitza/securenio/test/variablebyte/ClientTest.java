@@ -19,13 +19,16 @@ package ch.dermitza.securenio.test.variablebyte;
 
 import ch.dermitza.securenio.packet.worker.AbstractPacketWorker;
 import ch.dermitza.securenio.packet.worker.SimplePacketWorker;
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 /**
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class ClientTest implements Runnable {
 
@@ -123,7 +126,8 @@ public class ClientTest implements Runnable {
 
     public static void main(String[] args) {
         //System.setProperty("javax.net.debug", "all");
-        int clientNo = 10;
+        LoggerHandler.setLevel(Level.CONFIG);
+        int clientNo = 100;
         int packetNo = 1;
         long start;
         long elapsed;
@@ -132,10 +136,10 @@ public class ClientTest implements Runnable {
         try {
             a = InetAddress.getByName("127.0.0.1");
             //a = InetAddress.getByName("alpharesearch.org");
-            //a = InetAddress.getByName("192.168.1.10");
+            //a = InetAddress.getByName("192.168.1.11");
         } catch (UnknownHostException uhe) {
         }
-        ClientTest ct = new ClientTest(a, 44503, true, true, packetNo, clientNo);
+        ClientTest ct = new ClientTest(a, 44503, false, false, packetNo, clientNo);
         //ClientTest ct = new ClientTest(a, 443, true, packetNo, clientNo);
         // init x clients
         ct.initClients();

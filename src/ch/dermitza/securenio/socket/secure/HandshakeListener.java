@@ -26,7 +26,8 @@ import ch.dermitza.securenio.socket.SocketIF;
  * associated with each {@link SecureSocket} instance.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public interface HandshakeListener {
 
@@ -41,4 +42,6 @@ public interface HandshakeListener {
      * @see ch.dermitza.securenio.AbstractSelector
      */
     public void handshakeComplete(SocketIF socket);
+    
+   // public void crap(SocketIF socket);
 }

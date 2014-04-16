@@ -20,13 +20,16 @@ package ch.dermitza.securenio.test.singlebyte;
 import ch.dermitza.securenio.packet.singlebyte.PacketPing;
 import ch.dermitza.securenio.packet.worker.AbstractPacketWorker;
 import ch.dermitza.securenio.packet.worker.SimplePacketWorker;
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 /**
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class ClientTest implements Runnable {
 
@@ -124,7 +127,8 @@ public class ClientTest implements Runnable {
 
     public static void main(String[] args) {
         //System.setProperty("javax.net.debug", "all");
-        int clientNo = 1000;
+        LoggerHandler.setLevel(Level.ALL);
+        int clientNo = 1;
         int packetNo = 1;
         long start;
         long elapsed;
@@ -136,7 +140,7 @@ public class ClientTest implements Runnable {
             //a = InetAddress.getByName("192.168.1.10");
         } catch (UnknownHostException uhe) {
         }
-        ClientTest ct = new ClientTest(a, 44503, true, true, packetNo, clientNo);
+        ClientTest ct = new ClientTest(a, 44503, true, false, packetNo, clientNo);
         //ClientTest ct = new ClientTest(a, 443, true, packetNo, clientNo);
         // init x clients
         ct.initClients();
@@ -149,10 +153,10 @@ public class ClientTest implements Runnable {
         // start the timer check thread
         new Thread(ct).start();
         // Kick off exchanges
-        //try {
-        //    Thread.sleep(5000);
-        //} catch (InterruptedException ie) {
-        //}
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ie) {
+        }
         ct.initSend();
         try {
             Thread.sleep(150);

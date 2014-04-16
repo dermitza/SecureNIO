@@ -212,3 +212,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+/nbproject/private/
+/build.xml
+/manifest.mf
+/lib/
+/nbproject/
+/nbdist/

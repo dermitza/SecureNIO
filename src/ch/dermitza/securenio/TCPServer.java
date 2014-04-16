@@ -22,12 +22,15 @@ import ch.dermitza.securenio.packet.worker.AbstractPacketWorker;
 import ch.dermitza.securenio.socket.PlainSocket;
 import ch.dermitza.securenio.socket.SocketIF;
 import ch.dermitza.securenio.socket.secure.SecureSocket;
+import ch.dermitza.securenio.util.PropertiesReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
 import javax.net.ssl.SSLEngine;
 
 /**
@@ -36,11 +39,11 @@ import javax.net.ssl.SSLEngine;
  * {@link SecureSocket}s.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class TCPServer extends AbstractSelector {
 
-    private static final int BACKLOG = 10000;
     private ServerSocketChannel ssc;
 
     /**
@@ -50,15 +53,12 @@ public class TCPServer extends AbstractSelector {
      * @param port The port to listen on
      * @param packetWorker The instance of packet worker to use
      * @param usingSSL Whether we are using SSL/TLS
-     * @param singleThreaded Whether or not the {@link SSLEngine} tasks should
-     * run on the same thread or on the
-     * {@link ch.dermitza.securenio.socket.secure.TaskWorker} thread.
      * @param needClientAuth Whether we need clients to also authenticate
      */
     public TCPServer(InetAddress address, int port,
             AbstractPacketWorker packetWorker, boolean usingSSL,
-            boolean singleThreaded, boolean needClientAuth) {
-        super(address, port, packetWorker, usingSSL, singleThreaded, false,
+            boolean needClientAuth) {
+        super(address, port, packetWorker, usingSSL, false,
                 needClientAuth);
     }
 
@@ -91,19 +91,19 @@ public class TCPServer extends AbstractSelector {
     protected void initConnection() throws IOException {
 
         // Create a new non-blocking server socket channel
-        System.err.println("[Server] Creating NB ServerSocketChannel");
+        logger.config("Creating NB ServerSocketChannel");
         ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
 
         // Bind the server socket to the specified address and port
-        System.err.println("[Server] Binding ServerSocket to *:" + port);
+        logger.log(Level.CONFIG, "Binding ServerSocket to *:{0}", port);
         InetSocketAddress isa = new InetSocketAddress(address, port);
         //ssc.socket().setReuseAddress(true);
-        ssc.socket().bind(isa, BACKLOG);
+        ssc.socket().bind(isa, PropertiesReader.getBacklog());
 
         // Register the server socket channel, indicating an interest in 
         // accepting new connections
-        System.err.println("[Server] Registering ServerChannel to selector");
+        logger.finest("Registering ServerChannel to selector");
         ssc.register(selector, SelectionKey.OP_ACCEPT);
 
     }
@@ -128,10 +128,12 @@ public class TCPServer extends AbstractSelector {
             // Accept the connection and make it non-blocking
             socketChannel = ssc.accept();
             socketChannel.configureBlocking(false);
-
-            // TODO CHECK THIS
-            socketChannel.socket().setSendBufferSize(512);
-            socketChannel.socket().setReceiveBufferSize(512);
+            socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, PropertiesReader.getTCPNoDelay());
+            socketChannel.setOption(StandardSocketOptions.SO_SNDBUF, PropertiesReader.getSoSndBuf());
+            socketChannel.setOption(StandardSocketOptions.SO_RCVBUF, PropertiesReader.getSoRcvBuf());
+            socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, PropertiesReader.getKeepAlive());
+            socketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, PropertiesReader.getReuseAddress());
+            socketChannel.setOption(StandardSocketOptions.IP_TOS, PropertiesReader.getIPTos());
 
             // Register the new SocketChannel with our Selector, indicating
             // we'd like to be notified when there's data waiting to be read
@@ -149,6 +151,7 @@ public class TCPServer extends AbstractSelector {
                 socket = new PlainSocket(socketChannel);
             }
         } catch (IOException ioe) {
+            logger.log(Level.INFO, "IOE accepting the connection", ioe);
             // If accepting the connection failed, close the socket and remove
             // any references to it
             if (socket != null) {
@@ -158,7 +161,7 @@ public class TCPServer extends AbstractSelector {
         }
         // Finally, add the socket to our socket container
         container.addSocket(socketChannel, socket);
-        System.err.println("[Server] " + peerHost + ":" + peerPort + " connected");
+        logger.log(Level.CONFIG, "{0}:{1} connected", new Object[]{peerHost, peerPort});
     }
 
     /**

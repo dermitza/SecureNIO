@@ -22,13 +22,16 @@ import ch.dermitza.securenio.packet.PacketIF;
 import ch.dermitza.securenio.packet.PacketListener;
 import ch.dermitza.securenio.packet.worker.AbstractPacketWorker;
 import ch.dermitza.securenio.socket.SocketIF;
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 /**
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class ServerTest implements PacketListener {
 
@@ -37,7 +40,7 @@ public class ServerTest implements PacketListener {
     public ServerTest(InetAddress address, int port,
             AbstractPacketWorker packetWorker, boolean usingSSL,
             boolean needClientAuth) {
-        server = new TCPServer(address, port, packetWorker, usingSSL, false,
+        server = new TCPServer(address, port, packetWorker, usingSSL,
                 needClientAuth);
         if (usingSSL) {
             String trustStoreLoc = null;
@@ -63,6 +66,7 @@ public class ServerTest implements PacketListener {
 
     public static void main(String[] args) {
         //System.setProperty("javax.net.debug", "all");
+        LoggerHandler.setLevel(Level.ALL);
         InetAddress a = null;
         try {
             a = InetAddress.getByName("127.0.0.1");

@@ -22,6 +22,8 @@ import ch.dermitza.securenio.socket.SocketIF;
 import ch.dermitza.securenio.socket.timeout.TimeoutListener;
 import ch.dermitza.securenio.socket.timeout.worker.Timeout;
 import ch.dermitza.securenio.socket.timeout.worker.TimeoutWorker;
+import ch.dermitza.securenio.util.PropertiesReader;
+import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -33,6 +35,8 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import static javax.net.ssl.SSLEngineResult.Status.BUFFER_OVERFLOW;
@@ -49,10 +53,12 @@ import javax.net.ssl.SSLSession;
  * this class is declared as final as it should NOT be extended.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since 0.18
  */
 public final class SecureSocket implements SocketIF {
 
+    private static final Logger logger = LoggerHandler.getLogger(SecureSocket.class.getName());
     private final SocketChannel sc;
     private final SSLEngine engine;
     // BUFFERS
@@ -106,7 +112,7 @@ public final class SecureSocket implements SocketIF {
         // Timeouts
         this.toWorker = toWorker;
         this.toListener = toListener;
-        timeout = new Timeout(this, toListener, Timeout.TIMEOUT_MS);
+        timeout = new Timeout(this, toListener, PropertiesReader.getTimeoutMS());
 
         int appBufSize = engine.getSession().getApplicationBufferSize();
         int netBufSize = engine.getSession().getPacketBufferSize();
@@ -250,7 +256,6 @@ public final class SecureSocket implements SocketIF {
      */
     @Override
     public void processHandshake() throws IOException {
-        //System.out.println("In thread " + Thread.currentThread());
         int count;
         SSLEngineResult.HandshakeStatus status;
         // At first call of processHandshake(), there is no SSLEngineResult
@@ -263,8 +268,8 @@ public final class SecureSocket implements SocketIF {
         // process the handshake status
         switch (status) {
             case NEED_TASK:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() NEED_TASK");
+                logger.log(Level.FINEST, "{0} NEED_TASK",
+                        sc.socket().getRemoteSocketAddress());
                 // Run the delegated SSL/TLS tasks
                 runDelegatedTasks();
                 if (!singleThreaded) {
@@ -272,19 +277,31 @@ public final class SecureSocket implements SocketIF {
                     return;
                 }
             case NEED_UNWRAP:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() NEED_UNWRAP");
+                logger.log(Level.FINEST, "{0} NEED_UNWRAP",
+                        sc.socket().getRemoteSocketAddress());
                 // Don’t read if inbound is already closed
                 count = engine.isInboundDone()
                         ? -1
                         : sc.read(encryptedIn);
+                logger.log(Level.FINEST, "Read {0} bytes", count);
                 encryptedIn.flip();
-                result = engine.unwrap(encryptedIn, decryptedIn);
-                encryptedIn.compact();
+                try {
+                    result = engine.unwrap(encryptedIn, decryptedIn);
+                    encryptedIn.compact();
+                } catch (IllegalStateException ise) {
+                    // SSLEngine may fail with IllegalStateException in some
+                    // cases when receiving unexpected kinds of SSL records
+                    // after being closed, see:
+                    // https://github.com/spray/spray/issues/743
+                    // https://github.com/spray/spray/commit/cd1cfb8
+                    // https://groups.google.com/forum/#!msg/spray-user/v3x3ZfyVVF0/9DqHCGa9M38J
+                    // https://groups.google.com/forum/#%21msg/spray-user/qxntq3aRc_I/TPj4r0XGobgJ
+                    logger.log(Level.FINEST, "Ignoring exception in close()");
+                }
                 break;
             case NEED_WRAP:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() NEED_WRAP");
+                logger.log(Level.FINEST, "{0} NEED_WRAP",
+                        sc.socket().getRemoteSocketAddress());
                 decryptedOut.flip();
                 result = engine.wrap(decryptedOut, encryptedOut);
                 decryptedOut.compact();
@@ -310,15 +327,15 @@ public final class SecureSocket implements SocketIF {
                 }
                 break;
             case FINISHED:
+                logger.log(Level.FINEST, "{0} FINISHED",
+                        sc.socket().getRemoteSocketAddress());
                 handshakePending = false;
                 // Indicate to the associated handshake listener that the
                 // handshake is complete
                 hsListener.handshakeComplete(this);
-            //System.out.println(sc.socket().getLocalPort() + ":"
-            //+ sc.socket().getPort() + " processHandshake() FINISHED");
             case NOT_HANDSHAKING:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() NOT_HANDSHAKING");
+                logger.log(Level.FINEST, "{0} NOT_HANDSHAKING",
+                        sc.socket().getRemoteSocketAddress());
                 // handshake has been completed at this point, no need to 
                 // check the status of the SSLEngineResult;
                 return;
@@ -329,24 +346,24 @@ public final class SecureSocket implements SocketIF {
             case BUFFER_UNDERFLOW:
                 // Return as we do not have enough data to continue processing
                 // the handshake
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() BUFFER_UNDERFLOW");
+                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 return;
             case BUFFER_OVERFLOW:
+                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 // Return as the encrypted buffer has not been cleared yet
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() BUFFER_OVERFLOW");
                 return;
             case CLOSED:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() CLOSED");
+                logger.log(Level.FINEST, "{0} CLOSED",
+                        sc.socket().getRemoteSocketAddress());
                 if (engine.isOutboundDone()) {
                     sc.socket().shutdownOutput();// stop sending
                 }
                 return;
             case OK:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " processHandshake() OK");
+                logger.log(Level.FINEST, "{0} OK",
+                        sc.socket().getRemoteSocketAddress());
                 // handshaking can continue.
                 break;
         }
@@ -450,8 +467,8 @@ public final class SecureSocket implements SocketIF {
         int pos = decryptedIn.position();
         // Read from the channel
         int count = sc.read(encryptedIn);
-        //System.out.println(sc.socket().getLocalPort() + ":"
-        //+ sc.socket().getPort() + " Read " + count + " bytes encrypted");
+        logger.log(Level.FINEST, "{0} Read {1} bytes encrypted",
+                new Object[]{sc.socket().getRemoteSocketAddress(), count});
         if (count == -1) {
             // We have reached EOF, propagate one level up
             // At this point, we may not have received close_notify from peer,
@@ -475,24 +492,24 @@ public final class SecureSocket implements SocketIF {
                 // machine or depleting the host machine's memory.
                 // Schedule a new timeout
                 toWorker.insert(timeout);
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " read() BUFFER_UNDERFLOW");
+                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 return 0;
             case BUFFER_OVERFLOW:
                 if (!timeout.hasExpired()) {
                     // cancel any previous timeout
                     toWorker.cancel(timeout);
                 }
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " read() BUFFER_OVERFLOW");
+                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 // This should never happen (ideally). If this happens, the
                 // thread responsible for emptying the decryptedIn buffer has 
                 // not done so in time. Throw an exception to be handled at the
                 // application layer.
                 throw new BufferOverflowException();
             case CLOSED:
-                //System.out.println(sc.socket().getLocalPort() + ":"
-                //+ sc.socket().getPort() + " read() CLOSED");
+                logger.log(Level.FINEST, "{0} CLOSED",
+                        sc.socket().getRemoteSocketAddress());
                 // The SSLEngine was inbound closed, there is and will be no
                 // more input from the engine, so setup the socket appropriately
                 // too. An outbound close_notify will be send by the SSLEngine
@@ -503,8 +520,8 @@ public final class SecureSocket implements SocketIF {
                     // cancel any previous timeout
                     toWorker.cancel(timeout);
                 }
-                //System.out.println(sc.socket().getLocalPort()
-                //+ ":" + sc.socket().getPort() + " read() OK");
+                logger.log(Level.FINEST, "{0} OK",
+                        sc.socket().getRemoteSocketAddress());
                 break;
         }
         // process any handshaking now required
@@ -540,28 +557,28 @@ public final class SecureSocket implements SocketIF {
         // Process the engineResult.Status
         switch (result.getStatus()) {
             case BUFFER_UNDERFLOW:
-                //System.out.println(sc.socket().getLocalPort()
-                //+ ":" + sc.socket().getPort() + " write() BUFFER_UNDERFLOW");
+                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 // This shouldn't happen as we only call write() when there is
                 // data to be written, throw an exception that will be handled
                 // in the application layer.
                 throw new BufferUnderflowException();
             case BUFFER_OVERFLOW:
-                //System.out.println(sc.socket().getLocalPort()
-                //+ ":" + sc.socket().getPort() + " write() BUFFER_OVERFLOW");
+                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                        sc.socket().getRemoteSocketAddress());
                 // This shouldn't happen if we flush data that has been wrapped
                 // as we do in this implementation, throw an exception that will
                 // be handled in the application layer.
                 throw new BufferOverflowException();
             case CLOSED:
-                //System.out.println(sc.socket().getLocalPort()
-                //+ ":" + sc.socket().getPort() + " write() CLOSED");
+                logger.log(Level.FINEST, "{0} CLOSED",
+                        sc.socket().getRemoteSocketAddress());
                 // Trying to write on a closed SSLEngine, throw an exception
                 // that will be handled in the application layer.
                 throw new SSLException("SSLEngine is CLOSED");
             case OK:
-                //System.out.println(sc.socket().getLocalPort()
-                //+ ":" + sc.socket().getPort() + " write() OK");
+                logger.log(Level.FINEST, "{0} OK",
+                        sc.socket().getRemoteSocketAddress());
                 // Everything is good, everything is fine.
                 break;
         }
@@ -574,22 +591,78 @@ public final class SecureSocket implements SocketIF {
     }
 
     /**
-     * Flush encrypted output data to the underlying {@link SocketChannel}.
-     *
-     * An attempt is made to write all encrypted bytes to the channel, but it is
-     * not guaranteed.
+     * Flush encrypted output data to the underlying {@link SocketChannel}. This
+     * method will block until all data is written to the channel. TODO:
+     * implement a selector pool instead of looping until all data is written.
+     * Another option would be increasing the SO_SNDBUF size to twice the size,
+     * it can be done on the fly and could circumvent the temporary selector
+     * issue.
      *
      * @return The number of bytes written, possibly zero
      * @throws IOException Propagated exceptions from the underlying
      * {@link SocketChannel#write(ByteBuffer buffer)} implementation.
      */
     private int flush() throws IOException {
+        // Selector temp = null;
         encryptedOut.flip();
-        int count = sc.write(encryptedOut);
+        int remaining = encryptedOut.remaining();
+        //System.out.println("Encrypted out remaining: " + remaining);
+        int countOut = 0;
+        int count;
+        int retries = 0;
+        
+        while(encryptedOut.hasRemaining()){
+            count = sc.write(encryptedOut);
+            countOut += count;
+            retries++;
+        }
+        /*
+        while (encryptedOut.hasRemaining()) {
+            count = sc.write(encryptedOut);
+            countOut += count;
+            retries++;
+            //System.out.println(sc.socket().getLocalPort()
+            //    + ":" + sc.socket().getPort() + " Flushed " + count + " bytes");
+            if (count < 0) {
+                throw new IOException("EOF during flush");
+            }
+
+            if (count == 0) {
+                // write channel full.  Try letting other threads have a go.
+                Thread.yield();
+                count = sc.write(encryptedOut);
+                countOut += count;
+                retries++;
+                if (count < 0) {
+                    throw new IOException("EOF during flush");
+                }
+
+                if (count == 0) {
+                    // still full.  need to  block until it is writable.
+                    // TODO: implement a selector pull to handle this write
+                    while (encryptedOut.hasRemaining()) {
+                        count = sc.write(encryptedOut);
+                        countOut += count;
+                        retries++;
+                    }
+                    temp = Selector.open();
+                    getSocket().register(temp, SelectionKey.OP_WRITE);
+                    temp.select();
+                }
+            }
+        }
+        if (temp != null) {
+            temp.close();
+            temp = null;
+        }
+        */
         encryptedOut.compact();
-        //System.out.println(sc.socket().getLocalPort()
-        //+ ":" + sc.socket().getPort() + " Flushed " + count + " bytes");
-        return count;
+
+
+        logger.log(Level.FINEST, "{0} Flushed {1} bytes, {2} retries.",
+                new Object[]{sc.socket().getRemoteSocketAddress(),
+                    countOut, retries <= 1 ? 0 : retries});
+        return countOut;
     }
 
     /**

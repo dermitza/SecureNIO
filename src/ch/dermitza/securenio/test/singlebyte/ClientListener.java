@@ -29,7 +29,8 @@ import java.net.InetAddress;
 /**
  * A simplistic client implementation listening for packets
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  */
 public class ClientListener implements PacketListener {
 
@@ -41,7 +42,7 @@ public class ClientListener implements PacketListener {
     public ClientListener(InetAddress address, int port,
             AbstractPacketWorker packetWorker, boolean usingSSL,
             boolean needClientAuth, int maxPackets) {
-        client = new TCPClient(address, port, packetWorker, usingSSL, false,
+        client = new TCPClient(address, port, packetWorker, usingSSL,
                 needClientAuth);
         if (usingSSL) {
             String keyStoreLoc = null;

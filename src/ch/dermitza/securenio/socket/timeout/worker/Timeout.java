@@ -28,17 +28,14 @@ import ch.dermitza.securenio.socket.timeout.TimeoutListener;
  * an SSL/TLS re-handshake and so on).
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since   0.18
  *
  * @see TimeoutWorker
  * @see TimeoutWorker
  */
 public class Timeout implements Comparable<Timeout> {
 
-    /**
-     * Default timeout value (in ms)
-     */
-    public static final long TIMEOUT_MS = 10000;
     /**
      * Unused TODO
      */
