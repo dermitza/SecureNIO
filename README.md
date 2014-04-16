@@ -18,13 +18,21 @@
 
 ## Changes
 
+* _v0.19_
+  * Fixed an error where the SSLEngine may fail with IllegalStateException in some cases when receiving unexpected kinds of SSL records after being closed
+  * Fixed an error where if the SO_SNDBUF was full the selector would hang as we do not (re-)register for writes. As such, flushing() is now blocking until all data has been written to the socket
+  * Implemented (partial) logging
+  * Read static variables from properties on disk
+  * Additional support classes
+  * Additional javadoc (yay)
 * _v0.18 -_ First released version
 
 ## Binaries
 
 All binaries are compiled using Java 1.7.0_09; Java HotSpot(TM) 64-Bit Server VM 23.5-b02 unless otherwise noted.
 
-* _Version 0.18 -_ [SecureNIO\_v0.18.jar](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.18.jar)  [SecureNIO_v0.18_doc.zip](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.18_doc.zip)
+* _Version 0.19 -_ [SecureNIO\_v0.19.jar](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19.jar)  [SecureNIO_v0.19_doc.zip](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19_doc.zip)
+* _Version 0.18 -_ [SecureNIO\_v0.18.jar](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.19.jar)  [SecureNIO_v0.18_doc.zip](https://github.com/dermitza/SecureNIO/raw/master/dist/SecureNIO_v0.18_doc.zip)
 
 ## Documentation
 
