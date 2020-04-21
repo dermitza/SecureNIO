@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractPacketWorker implements Runnable {
 
-    private final Logger logger = LoggerHandler.getLogger(AbstractPacketWorker.class.getName());
+    private final Logger LOGGER = LoggerHandler.getLogger(AbstractPacketWorker.class.getName());
     private final ArrayList<PacketListener> listeners = new ArrayList<>();
     /**
      * Maps a SocketChannel to a list of ByteBuffer instances
@@ -92,10 +92,10 @@ public abstract class AbstractPacketWorker implements Runnable {
 
                 if (count > buffer.remaining()) {
                     int diff = count - buffer.remaining();
-                    logger.log(Level.CONFIG, "Buffer needs resizing, remaining{0}"
+                    LOGGER.log(Level.CONFIG, "Buffer needs resizing, remaining{0}"
                             + "needed {1} difference {2}",
                             new Object[]{buffer.remaining(), count, diff});
-                    logger.log(Level.FINEST, "old size: {0}", buffer.capacity());
+                    LOGGER.log(Level.FINEST, "old size: {0}", buffer.capacity());
                     // Allocate a new buffer. To minimize new buffer allocation,
                     // we resize the buffer appropriately, in case this is a
                     // *really* busy channel. Notes: If it is an extremely busy
@@ -108,10 +108,10 @@ public abstract class AbstractPacketWorker implements Runnable {
                     int extSize = (diff > PropertiesReader.getPacketBufSize())
                             ? diff : PropertiesReader.getPacketBufSize();
                     ByteBuffer temp = ByteBuffer.allocate(buffer.capacity() + extSize);
-                    logger.log(Level.FINEST, "new size: {0}", temp.capacity());
+                    LOGGER.log(Level.FINEST, "new size: {0}", temp.capacity());
                     // Flip existing buffer to prepare for putting in the replacement
                     buffer.flip();
-                    logger.log(Level.FINEST, "pos {0} lim {1} cap {2}",
+                    LOGGER.log(Level.FINEST, "pos {0} lim {1} cap {2}",
                             new Object[]{buffer.position(), buffer.limit(),
                                 buffer.capacity()});
                     // put existing buffer into the temporary replacement
@@ -127,7 +127,7 @@ public abstract class AbstractPacketWorker implements Runnable {
                 }
                 // Make a copy of the data
                 buffer.put(tempArray);
-                logger.log(Level.FINEST, "pos {0} lim {1} cap {2}",
+                LOGGER.log(Level.FINEST, "pos {0} lim {1} cap {2}",
                         new Object[]{buffer.position(), buffer.limit(),
                             buffer.capacity()});
             }
@@ -152,7 +152,7 @@ public abstract class AbstractPacketWorker implements Runnable {
     @Override
     public void run() {
         running = true;
-        logger.config("Initializing...");
+        LOGGER.config("Initializing...");
 
         runLoop:
         while (running) {
@@ -215,7 +215,7 @@ public abstract class AbstractPacketWorker implements Runnable {
      * all listener references.
      */
     private void shutdown() {
-        logger.config("Shutting down...");
+        LOGGER.config("Shutting down...");
         // Clear the queue
         pendingData.clear();
         pendingSockets.clear();

@@ -130,7 +130,6 @@ public abstract class VariableLengthPacketWorker extends AbstractPacketWorker {
 
             while (data.position() < data.limit()) {
                 if (data.limit() - data.position() > (headerLength + sizeLength)) {
-                    //System.out.println("Have at least header+size bytes, reading");
                     // get the first byte
                     // get the header
                     short head;
@@ -146,7 +145,7 @@ public abstract class VariableLengthPacketWorker extends AbstractPacketWorker {
                     } else {
                         len = data.getInt();
                     }
-                    //System.out.println("Length: " + (len + 3));
+                    //System.out.println("Payload Length: " + len);
                     if (data.limit() - data.position() >= len) {
                         // we have at least one complete packet, make a copy and
                         // send it for reassembly
@@ -168,6 +167,7 @@ public abstract class VariableLengthPacketWorker extends AbstractPacketWorker {
                         }
                     } else {
                         //System.out.println("Not enough data to reconstruct packet");
+                        //System.out.println("Data length: " + (data.limit() - data.position()));
                         prepareForWait(data);
                         break;
                     }

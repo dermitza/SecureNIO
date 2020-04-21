@@ -31,12 +31,13 @@ import javax.net.ssl.TrustManagerFactory;
 public class SSLSecurityTest {
 
     public static void main(String[] args) throws Exception {
+        
         //System.err.println("Creating SSL context");
-        char[] passphrase = "alpharesearch".toCharArray();
+        char[] passphrase = "server".toCharArray();
 
         KeyStore ks = KeyStore.getInstance("JKS");
         //ks.load(new FileInputStream("test.jks"), passphrase);
-        ks.load(new FileInputStream("keystore.jks"), passphrase);
+        ks.load(new FileInputStream("server.jks"), passphrase);
 
         //System.err.println("Loaded keystore");
         SSLContext context = SSLContext.getInstance("TLS");
@@ -68,7 +69,8 @@ public class SSLSecurityTest {
                     "TLS_RSA_WITH_AES_128_CBC_SHA256",
                     "TLS_RSA_WITH_AES_128_CBC_SHA"
                 });
-        String[] suites = engine.getEnabledCipherSuites();
+        //String[] suites = engine.getEnabledCipherSuites();
+        String[] suites = engine.getSupportedCipherSuites();
         System.out.println("=============SUITES===========");
         for (int i = 0; i < suites.length; i++) {
             System.out.println(suites[i]);

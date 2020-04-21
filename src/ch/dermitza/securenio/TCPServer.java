@@ -39,10 +39,10 @@ import javax.net.ssl.SSLEngine;
  * {@link SecureSocket}s.
  *
  * @author K. Dermitzakis
- * @version 0.19
- * @since   0.18
+ * @version 0.20
+ * @since 0.18
  */
-public class TCPServer extends AbstractSelector {
+public class TCPServer extends AbstractSelector implements SenderIF{
 
     private ServerSocketChannel ssc;
 
@@ -71,6 +71,7 @@ public class TCPServer extends AbstractSelector {
      * @see AbstractSelector#send(ch.dermitza.securenio.socket.SocketIF,
      * java.nio.ByteBuffer)
      */
+    @Override
     public void send(SocketIF sc, PacketIF packet) {
         send(sc, packet.toBytes());
     }
@@ -91,19 +92,19 @@ public class TCPServer extends AbstractSelector {
     protected void initConnection() throws IOException {
 
         // Create a new non-blocking server socket channel
-        logger.config("Creating NB ServerSocketChannel");
+        LOGGER.config("Creating NB ServerSocketChannel");
         ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
 
         // Bind the server socket to the specified address and port
-        logger.log(Level.CONFIG, "Binding ServerSocket to *:{0}", port);
+        LOGGER.log(Level.CONFIG, "Binding ServerSocket to *:{0}", port);
         InetSocketAddress isa = new InetSocketAddress(address, port);
         //ssc.socket().setReuseAddress(true);
         ssc.socket().bind(isa, PropertiesReader.getBacklog());
 
         // Register the server socket channel, indicating an interest in 
         // accepting new connections
-        logger.finest("Registering ServerChannel to selector");
+        LOGGER.finest("Registering ServerChannel to selector");
         ssc.register(selector, SelectionKey.OP_ACCEPT);
 
     }
@@ -139,10 +140,12 @@ public class TCPServer extends AbstractSelector {
             // we'd like to be notified when there's data waiting to be read
             socketChannel.register(selector, SelectionKey.OP_READ);
 
+            // Get remote address and port (for SSL socket and debugging)
+            peerHost = socketChannel.socket().getInetAddress().getHostAddress();
+            peerPort = socketChannel.socket().getPort();
+            
             // Now wrap it in our container
             if (usingSSL) {
-                peerHost = socketChannel.socket().getInetAddress().getHostAddress();
-                peerPort = socketChannel.socket().getPort();
                 SSLEngine engine = setupEngine(peerHost, peerPort);
 
                 socket = new SecureSocket(socketChannel, engine, singleThreaded,
@@ -151,7 +154,7 @@ public class TCPServer extends AbstractSelector {
                 socket = new PlainSocket(socketChannel);
             }
         } catch (IOException ioe) {
-            logger.log(Level.INFO, "IOE accepting the connection", ioe);
+            LOGGER.log(Level.INFO, "IOE accepting the connection", ioe);
             // If accepting the connection failed, close the socket and remove
             // any references to it
             if (socket != null) {
@@ -161,7 +164,7 @@ public class TCPServer extends AbstractSelector {
         }
         // Finally, add the socket to our socket container
         container.addSocket(socketChannel, socket);
-        logger.log(Level.CONFIG, "{0}:{1} connected", new Object[]{peerHost, peerPort});
+        LOGGER.log(Level.CONFIG, "{0}:{1} connected", new Object[]{peerHost, peerPort});
     }
 
     /**

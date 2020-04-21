@@ -17,7 +17,6 @@
  */
 package ch.dermitza.securenio.socket.timeout.worker;
 
-import ch.dermitza.securenio.AbstractSelector;
 import ch.dermitza.securenio.util.MinContainer;
 import ch.dermitza.securenio.util.logging.LoggerHandler;
 import java.util.logging.Level;
@@ -35,12 +34,12 @@ import java.util.logging.Logger;
  * {@link #insert(Timeout)} method.
  *
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since   0.18
  */
 public class TimeoutWorker implements Runnable {
 
-    private static final Logger logger = LoggerHandler.getLogger(TimeoutWorker.class.getName());
+    private static final Logger LOGGER = LoggerHandler.getLogger(TimeoutWorker.class.getName());
     private final MinContainer<Timeout> timeouts = new MinContainer<>();
     //private final Object lock = new Object();
     private Timeout currentTO = null;
@@ -80,9 +79,9 @@ public class TimeoutWorker implements Runnable {
         if (timeouts.remove(timeout)) {
             cancelled++;
         } else {
-            logger.info("Trying to cancel already removed timeout");
+            LOGGER.info("Trying to cancel already removed timeout");
         }
-        logger.log(Level.FINEST, "Timeout cancelled at {0}, expiring at: {1}",
+        LOGGER.log(Level.FINEST, "Timeout cancelled at {0}, expiring at: {1}",
                 new Object[]{System.currentTimeMillis(), timeout.getDelta()});
         this.notify();
     }
@@ -123,13 +122,13 @@ public class TimeoutWorker implements Runnable {
      */
     @Override
     public void run() {
-        logger.config("Initializing...");
+        LOGGER.config("Initializing...");
         running = true;
         runLoop:
         while (running) {
             synchronized (this) {
                 while (timeouts.isEmpty()) {
-                    logger.finest("Waiting for timeout");
+                    LOGGER.finest("Waiting for timeout");
                     // Check whether someone asked us to shutdown
                     // If its the case, and as the queue is empty
                     // we are free to break from the main loop and
@@ -140,7 +139,7 @@ public class TimeoutWorker implements Runnable {
                     try {
                         this.wait();
                     } catch (InterruptedException ie) {
-                        logger.log(Level.INFO, "TimeoutWorker lock interrupted on empty container", ie);
+                        LOGGER.log(Level.INFO, "TimeoutWorker lock interrupted on empty container", ie);
                     }
                 }
                 // At least one timeout was added, loop until timeouts are empty
@@ -154,12 +153,12 @@ public class TimeoutWorker implements Runnable {
                         break;
                     }
                     try {
-                        logger.log(Level.FINEST, "Waiting at {0} until: {1}",
+                        LOGGER.log(Level.FINEST, "Waiting at {0} until: {1}",
                                 new Object[]{System.currentTimeMillis(),
                                     System.currentTimeMillis() + waitTime});
                         this.wait(waitTime);
                     } catch (InterruptedException ie) {
-                        logger.log(Level.INFO, "TimeoutWorker lock interrupted while waiting on timeout", ie);
+                        LOGGER.log(Level.INFO, "TimeoutWorker lock interrupted while waiting on timeout", ie);
                     }
                     // Here, either the timeout expired or the lock was notified
                     // due to at least one new timeout being added
@@ -167,7 +166,7 @@ public class TimeoutWorker implements Runnable {
                         break runLoop;
                     }
                 }
-                logger.finest("Out of timeoutWait loop, no more timeouts");
+                LOGGER.finest("Out of timeoutWait loop, no more timeouts");
             }
         }
         shutdown();
@@ -179,8 +178,8 @@ public class TimeoutWorker implements Runnable {
      * This implementation is thread-safe.
      */
     private synchronized void shutdown() {
-        logger.config("Shutting down...");
-        logger.log(Level.FINEST,
+        LOGGER.config("Shutting down...");
+        LOGGER.log(Level.FINEST,
                 "Processed {0} timeouts, {1} expired, {2} cancelled",
                 new Object[]{inserted, expired, cancelled});
         timeouts.clear();
@@ -201,14 +200,14 @@ public class TimeoutWorker implements Runnable {
         }
 
         while (currentTO.isExpired() && !timeouts.isEmpty()) {
-            logger.log(Level.FINEST, "Timeout expired at {0}, expiring at:{1}",
+            LOGGER.log(Level.FINEST, "Timeout expired at {0}, expiring at:{1}",
                     new Object[]{System.currentTimeMillis(),
                         currentTO.getDelta()});
             currentTO.expired();
             if (timeouts.remove(currentTO)) {
                 expired++;
             } else {
-                logger.info("Trying to remove already removed timeout");
+                LOGGER.info("Trying to remove already removed timeout");
             }
 
             if ((currentTO = timeouts.getMin()) == null) {

@@ -29,7 +29,7 @@ import java.net.InetAddress;
 /**
  * A simplistic client implementation listening for packets
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since   0.18
  */
 public class ClientListener implements PacketListener {
@@ -52,8 +52,7 @@ public class ClientListener implements PacketListener {
                 ksPassPhrase = "client".toCharArray();
             }
             client.setupSSL("serverPublic.jks", keyStoreLoc,
-                    "serverPublic".toCharArray(), ksPassPhrase,
-                    "protocols", "cipherSuites");
+                    "serverPublic".toCharArray(), ksPassPhrase);
         }
         client.addListener(this);
         this.maxPackets = maxPackets;
@@ -70,7 +69,7 @@ public class ClientListener implements PacketListener {
             client.setRunning(false);
         } else {
             if (client.isConnected()) {
-                client.send(new PacketPing());
+                client.send(socket, new PacketPing());
             }
         }
     }

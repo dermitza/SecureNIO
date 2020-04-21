@@ -31,23 +31,23 @@ import java.util.logging.Logger;
  * the options set, please look at the supplied setup.properties.
  *
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since 0.19
  */
 public class PropertiesReader {
 
-    private static final Logger logger = LoggerHandler.getLogger(PropertiesReader.class.getName());
-    private static final String settings_loc = "setup.properties";
-    private static final Properties props = new Properties();
+    private static final Logger LOGGER = LoggerHandler.getLogger(PropertiesReader.class.getName());
+    private static final String SETTINGS_LOC = "setup.properjties";
+    private static final Properties PROPS = new Properties();
 
     static {
-        try (FileInputStream fis = new FileInputStream(settings_loc)) {
-            props.load(fis);
+        try (FileInputStream fis = new FileInputStream(SETTINGS_LOC)) {
+            PROPS.load(fis);
         } catch (FileNotFoundException ex) {
-            logger.log(Level.SEVERE, "Properties file not found, exiting", ex);
+            LOGGER.log(Level.SEVERE, "Properties file not found, exiting", ex);
             System.exit(-1);
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "IOException while reading properties, exiting", ex);
+            LOGGER.log(Level.SEVERE, "IOException while reading properties, exiting", ex);
             System.exit(-1);
         }
     }
@@ -99,7 +99,7 @@ public class PropertiesReader {
         int i = getPropAsInt("socket.max_changes");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.max_changes value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -123,7 +123,7 @@ public class PropertiesReader {
         long l = getPropAsLong("socket.max_changes");
 
         if (l < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.max_changes value is invalid: {0}. Shutting down", l);
             System.exit(-1);
         }
@@ -143,7 +143,7 @@ public class PropertiesReader {
         long l = getPropAsLong("timeout.period_ms");
 
         if (l < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.max_changes value is invalid: {0}. Shutting down", l);
             System.exit(-1);
         }
@@ -161,7 +161,7 @@ public class PropertiesReader {
         int i = getPropAsInt("socket.backlog");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.backlog value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -185,7 +185,7 @@ public class PropertiesReader {
         int i = getPropAsInt("packetworker.buffer_size");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "packetworker.buffer_size value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -203,7 +203,7 @@ public class PropertiesReader {
         int i = getPropAsInt("socket.so_sndbuf");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.so_sndbuf value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -221,7 +221,7 @@ public class PropertiesReader {
         int i = getPropAsInt("socket.so_rcvbuf");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.so_rcvbuf value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -239,7 +239,7 @@ public class PropertiesReader {
         int i = getPropAsInt("socket.ip_tos");
 
         if (i < 0) {
-            logger.log(Level.SEVERE,
+            LOGGER.log(Level.SEVERE,
                     "socket.ip_tos value is invalid: {0}. Shutting down", i);
             System.exit(-1);
         }
@@ -329,7 +329,7 @@ public class PropertiesReader {
         try {
             l = Long.parseLong(str);
         } catch (NumberFormatException nfe) {
-            logger.log(Level.SEVERE, key + " value is invalid, shutting down", nfe);
+            LOGGER.log(Level.SEVERE, key + " value is invalid, shutting down", nfe);
             System.exit(-1);
         }
         return l;
@@ -348,7 +348,7 @@ public class PropertiesReader {
         try {
             i = Integer.parseInt(str);
         } catch (NumberFormatException nfe) {
-            logger.log(Level.SEVERE, key + " value is invalid, shutting down", nfe);
+            LOGGER.log(Level.SEVERE, key + " value is invalid, shutting down", nfe);
             System.exit(-1);
         }
         return i;
@@ -364,7 +364,7 @@ public class PropertiesReader {
     private static boolean getPropAsBool(String key) {
         String str = getProp(key);
         if (!str.equals("true") && !str.equals("false")) {
-            logger.log(Level.SEVERE, "{0} value is invalid: {1}. Shutting down",
+            LOGGER.log(Level.SEVERE, "{0} value is invalid: {1}. Shutting down",
                     new Object[]{key, str});
             System.exit(-1);
         }
@@ -379,10 +379,10 @@ public class PropertiesReader {
      * @return the associated property
      */
     private static String getProp(String key) {
-        String str = props.getProperty(key);
+        String str = PROPS.getProperty(key);
         if (str == null || str.isEmpty()) {
             // Fail, these are essential properties
-            logger.log(Level.SEVERE, "{0} value not found, shutting down.", key);
+            LOGGER.log(Level.SEVERE, "{0} value not found, shutting down.", key);
             System.exit(-1);
         }
         return str;

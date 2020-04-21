@@ -33,7 +33,7 @@ import java.util.logging.Level;
 /**
  *
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since   0.18
  */
 public class ServerTest implements PacketListener {
@@ -52,8 +52,8 @@ public class ServerTest implements PacketListener {
                 trustStoreLoc = "clientPublic.jks";
                 tsPassPhrase = "clientPublic".toCharArray();
             }
-            server.setupSSL(trustStoreLoc, "server.jks", tsPassPhrase, "server".toCharArray(),
-                    "protocols", "cipherSuites");
+            server.setupSSL(trustStoreLoc, "server.jks", tsPassPhrase,
+                    "server".toCharArray());
         }
         server.addListener(this);
         new Thread(server, "ServerThread").start();

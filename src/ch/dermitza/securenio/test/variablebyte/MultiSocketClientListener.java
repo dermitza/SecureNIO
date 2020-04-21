@@ -27,7 +27,7 @@ import java.net.InetAddress;
  * A simplistic multi-socket client implementation listening for packets
  * 
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since 0.19
  */
 public class MultiSocketClientListener implements PacketListener {
@@ -52,8 +52,7 @@ public class MultiSocketClientListener implements PacketListener {
                 ksPassPhrase = "client".toCharArray();
             }
             client.setupSSL("serverPublic.jks", keyStoreLoc,
-                    "serverPublic".toCharArray(), ksPassPhrase,
-                    "protocols", "cipherSuites");
+                    "serverPublic".toCharArray(), ksPassPhrase);
         }
         client.addListener(this);
         this.maxPackets = maxPackets;

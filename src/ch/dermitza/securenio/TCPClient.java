@@ -38,10 +38,10 @@ import javax.net.ssl.SSLEngine;
  * {@link SecureSocket}s.
  *
  * @author K. Dermitzakis
- * @version 0.19
- * @since   0.18
+ * @version 0.20
+ * @since 0.18
  */
-public class TCPClient extends AbstractSelector {
+public class TCPClient extends AbstractSelector implements SenderIF {
 
     private SocketIF sc;
     private boolean connected = false;
@@ -64,20 +64,34 @@ public class TCPClient extends AbstractSelector {
     }
 
     /**
-     * Send an {@link PacketIF} over the this client's {@link SocketIF}. Since
+     * Send an {@link PacketIF} over this client's {@link SocketIF}. Since
      * the client only has one socket, no socket parameter is necessary.
      *
+     * @param socket The socket to send the PacketIF through.
      * @param packet The PacketIF to send through the associated SocketIF.
      *
      * @see AbstractSelector#send(ch.dermitza.securenio.socket.SocketIF,
      * java.nio.ByteBuffer)
      */
-    public void send(PacketIF packet) {
+    @Override
+    public void send(SocketIF socket, PacketIF packet) {
         // Sometimes during testing send is called before the socket is
         // even initialized. Does this happen on actual single client code?
-        if (sc != null) {
-            send(sc, packet.toBytes());
+        if (socket != null) {
+            send(socket, packet.toBytes());
         }
+    }
+
+    /**
+     * Send an {@link PacketIF} over this client's {@link SocketIF}. This
+     * method is client-specific as it does not require a socket parameter.
+     * 
+     * @param packet The PacketIF to send through the associated SocketIF.
+     * @see AbstractSelector#send(ch.dermitza.securenio.socket.SocketIF,
+     * java.nio.ByteBuffer)
+     */
+    public void send(PacketIF packet) {
+        send(sc, packet);
     }
 
     /**
@@ -117,14 +131,15 @@ public class TCPClient extends AbstractSelector {
         channel.register(selector, SelectionKey.OP_CONNECT);
         channel.setOption(StandardSocketOptions.SO_SNDBUF, PropertiesReader.getSoSndBuf());
         channel.setOption(StandardSocketOptions.SO_RCVBUF, PropertiesReader.getSoRcvBuf());
-        channel.setOption(StandardSocketOptions.SO_KEEPALIVE, PropertiesReader.getKeepAlive());
         channel.setOption(StandardSocketOptions.SO_REUSEADDR, PropertiesReader.getReuseAddress());
         channel.setOption(StandardSocketOptions.IP_TOS, PropertiesReader.getIPTos());
 
+        // Get remote address and port (for SSL socket and debugging)
+        String peerHost = channel.socket().getInetAddress().getHostAddress();
+        int peerPort = channel.socket().getPort();
+
         // now wrap the channel
         if (usingSSL) {
-            String peerHost = channel.socket().getInetAddress().getHostAddress();
-            int peerPort = channel.socket().getPort();
             SSLEngine engine = setupEngine(peerHost, peerPort);
 
             sc = new SecureSocket(channel, engine, singleThreaded, taskWorker,
@@ -170,7 +185,12 @@ public class TCPClient extends AbstractSelector {
         try {
             // TCP_NODELAY should be called after we are ready to connect,
             // otherwise the socket does not recognize the option.
-            sc.getSocket().setOption(StandardSocketOptions.TCP_NODELAY, PropertiesReader.getTCPNoDelay());
+            sc.getSocket().setOption(
+                    StandardSocketOptions.TCP_NODELAY,
+                    PropertiesReader.getTCPNoDelay());
+            sc.getSocket().setOption(
+                    StandardSocketOptions.SO_KEEPALIVE,
+                    PropertiesReader.getKeepAlive());
             sc.finishConnect();
         } catch (IOException ioe) {
             // Cancel the channel's registration with our selector
@@ -178,7 +198,7 @@ public class TCPClient extends AbstractSelector {
             // reason to keep the client running. Perhaps we can issue
             // a reconnection attempt at a later stage, TODO.
             setRunning(false);
-            logger.log(Level.SEVERE, "IOE at finishConnect(), shutting down", ioe);
+            LOGGER.log(Level.SEVERE, "IOE at finishConnect(), shutting down", ioe);
             key.cancel();
             return;
         }

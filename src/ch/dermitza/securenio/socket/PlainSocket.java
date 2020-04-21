@@ -36,7 +36,8 @@ import java.nio.channels.SocketChannel;
  * this implementation.
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.20
+ * @since 0.18
  */
 public final class PlainSocket implements SocketIF {
 
@@ -56,6 +57,20 @@ public final class PlainSocket implements SocketIF {
         this.channel = channel;
     }
 
+    /**
+     * Returns the underlying {@link SocketChannel}. This is done in order to
+     * register the current socket with a {@link Selector}, as only the
+     * {@link SocketChannel} implementation is allowed to be associated with a
+     * {@link Selector}.
+     *
+     * @return the underlying SocketChannel
+     */
+    @Override
+    public SocketChannel getSocket() {
+        return this.channel;
+    }
+
+    //---------------------- PASS-THROUGH IMPLEMENTATIONS --------------------//
     /**
      * Pass-through implementation of
      * {@link SocketChannel#configureBlocking(boolean block)}
@@ -132,19 +147,6 @@ public final class PlainSocket implements SocketIF {
     }
 
     /**
-     * Returns the underlying {@link SocketChannel}. This is done in order to
-     * register the current socket with a {@link Selector}, as only the
-     * {@link SocketChannel} implementation is allowed to be associated with a
-     * {@link Selector}.
-     *
-     * @return the underlying SocketChannel
-     */
-    @Override
-    public SocketChannel getSocket() {
-        return channel;
-    }
-
-    /**
      * Pass-through implementation of {@link SocketChannel#close()}
      *
      * @throws IOException Propagated exceptions from the underlying
@@ -165,6 +167,19 @@ public final class PlainSocket implements SocketIF {
     @Override
     public boolean finishConnect() throws IOException {
         return channel.finishConnect();
+    }
+
+    /**
+     * Pass-through implementation of {@link SocketChannel#isConnected()}
+     *
+     * Returns whether or not this channel's network socket is connected.
+     *
+     * @return true if, and only if, this channel's network socket is open and
+     * connected
+     */
+    @Override
+    public boolean isConnected() {
+        return channel.isConnected();
     }
 
     //---------------------- SSL/TLS METHODS (UNUSED) ------------------------//

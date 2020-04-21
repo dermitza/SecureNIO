@@ -38,7 +38,7 @@ import java.nio.channels.SocketChannel;
  * a {@link Selector}.
  *
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since   0.18
  *
  */
@@ -53,7 +53,15 @@ public interface SocketIF {
      * @return the underlying SocketChannel
      */
     SocketChannel getSocket();
-
+    
+    /**
+     * Pass-through implementation that returns the underlying
+     * {@link SocketChannel}'s connected status.
+     * 
+     * @return Whether the underlying SocketChannel is connected.
+     */
+    boolean isConnected();
+    
     //------------------ PASS-THROUGH IMPLEMENTATIONS ------------------------//
     /**
      * Pass-through implementation of

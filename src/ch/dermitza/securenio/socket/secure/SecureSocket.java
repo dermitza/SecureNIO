@@ -53,12 +53,12 @@ import javax.net.ssl.SSLSession;
  * this class is declared as final as it should NOT be extended.
  *
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since 0.18
  */
 public final class SecureSocket implements SocketIF {
 
-    private static final Logger logger = LoggerHandler.getLogger(SecureSocket.class.getName());
+    private static final Logger LOGGER = LoggerHandler.getLogger(SecureSocket.class.getName());
     private final SocketChannel sc;
     private final SSLEngine engine;
     // BUFFERS
@@ -245,6 +245,19 @@ public final class SecureSocket implements SocketIF {
     }
 
     /**
+     * Pass-through implementation of {@link SocketChannel#isConnected()}
+     *
+     * Tells whether or not this channel's network socket is connected.
+     *
+     * @return true if, and only if, this channel's network socket is open and
+     * connected
+     */
+    @Override
+    public boolean isConnected() {
+        return sc.isConnected();
+    }
+
+    /**
      * Performs SSL/TLS handshaking. Note that it can perform NEED_TASK either
      * on the same thread or on the {@link TaskWorker} thread, based on how the
      * {@link SecureSocket} has been initialized.
@@ -268,7 +281,7 @@ public final class SecureSocket implements SocketIF {
         // process the handshake status
         switch (status) {
             case NEED_TASK:
-                logger.log(Level.FINEST, "{0} NEED_TASK",
+                LOGGER.log(Level.FINEST, "{0} NEED_TASK",
                         sc.socket().getRemoteSocketAddress());
                 // Run the delegated SSL/TLS tasks
                 runDelegatedTasks();
@@ -277,13 +290,13 @@ public final class SecureSocket implements SocketIF {
                     return;
                 }
             case NEED_UNWRAP:
-                logger.log(Level.FINEST, "{0} NEED_UNWRAP",
+                LOGGER.log(Level.FINEST, "{0} NEED_UNWRAP",
                         sc.socket().getRemoteSocketAddress());
                 // Don’t read if inbound is already closed
                 count = engine.isInboundDone()
                         ? -1
                         : sc.read(encryptedIn);
-                logger.log(Level.FINEST, "Read {0} bytes", count);
+                LOGGER.log(Level.FINEST, "Read {0} bytes", count);
                 encryptedIn.flip();
                 try {
                     result = engine.unwrap(encryptedIn, decryptedIn);
@@ -296,11 +309,11 @@ public final class SecureSocket implements SocketIF {
                     // https://github.com/spray/spray/commit/cd1cfb8
                     // https://groups.google.com/forum/#!msg/spray-user/v3x3ZfyVVF0/9DqHCGa9M38J
                     // https://groups.google.com/forum/#%21msg/spray-user/qxntq3aRc_I/TPj4r0XGobgJ
-                    logger.log(Level.FINEST, "Ignoring exception in close()");
+                    LOGGER.log(Level.FINEST, "Ignoring exception in close()");
                 }
                 break;
             case NEED_WRAP:
-                logger.log(Level.FINEST, "{0} NEED_WRAP",
+                LOGGER.log(Level.FINEST, "{0} NEED_WRAP",
                         sc.socket().getRemoteSocketAddress());
                 decryptedOut.flip();
                 result = engine.wrap(decryptedOut, encryptedOut);
@@ -327,14 +340,14 @@ public final class SecureSocket implements SocketIF {
                 }
                 break;
             case FINISHED:
-                logger.log(Level.FINEST, "{0} FINISHED",
+                LOGGER.log(Level.FINEST, "{0} FINISHED",
                         sc.socket().getRemoteSocketAddress());
                 handshakePending = false;
                 // Indicate to the associated handshake listener that the
                 // handshake is complete
                 hsListener.handshakeComplete(this);
             case NOT_HANDSHAKING:
-                logger.log(Level.FINEST, "{0} NOT_HANDSHAKING",
+                LOGGER.log(Level.FINEST, "{0} NOT_HANDSHAKING",
                         sc.socket().getRemoteSocketAddress());
                 // handshake has been completed at this point, no need to 
                 // check the status of the SSLEngineResult;
@@ -346,23 +359,23 @@ public final class SecureSocket implements SocketIF {
             case BUFFER_UNDERFLOW:
                 // Return as we do not have enough data to continue processing
                 // the handshake
-                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 return;
             case BUFFER_OVERFLOW:
-                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 // Return as the encrypted buffer has not been cleared yet
                 return;
             case CLOSED:
-                logger.log(Level.FINEST, "{0} CLOSED",
+                LOGGER.log(Level.FINEST, "{0} CLOSED",
                         sc.socket().getRemoteSocketAddress());
                 if (engine.isOutboundDone()) {
                     sc.socket().shutdownOutput();// stop sending
                 }
                 return;
             case OK:
-                logger.log(Level.FINEST, "{0} OK",
+                LOGGER.log(Level.FINEST, "{0} OK",
                         sc.socket().getRemoteSocketAddress());
                 // handshaking can continue.
                 break;
@@ -467,7 +480,7 @@ public final class SecureSocket implements SocketIF {
         int pos = decryptedIn.position();
         // Read from the channel
         int count = sc.read(encryptedIn);
-        logger.log(Level.FINEST, "{0} Read {1} bytes encrypted",
+        LOGGER.log(Level.FINEST, "{0} Read {1} bytes encrypted",
                 new Object[]{sc.socket().getRemoteSocketAddress(), count});
         if (count == -1) {
             // We have reached EOF, propagate one level up
@@ -492,7 +505,7 @@ public final class SecureSocket implements SocketIF {
                 // machine or depleting the host machine's memory.
                 // Schedule a new timeout
                 toWorker.insert(timeout);
-                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 return 0;
             case BUFFER_OVERFLOW:
@@ -500,7 +513,7 @@ public final class SecureSocket implements SocketIF {
                     // cancel any previous timeout
                     toWorker.cancel(timeout);
                 }
-                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 // This should never happen (ideally). If this happens, the
                 // thread responsible for emptying the decryptedIn buffer has 
@@ -508,7 +521,7 @@ public final class SecureSocket implements SocketIF {
                 // application layer.
                 throw new BufferOverflowException();
             case CLOSED:
-                logger.log(Level.FINEST, "{0} CLOSED",
+                LOGGER.log(Level.FINEST, "{0} CLOSED",
                         sc.socket().getRemoteSocketAddress());
                 // The SSLEngine was inbound closed, there is and will be no
                 // more input from the engine, so setup the socket appropriately
@@ -520,7 +533,7 @@ public final class SecureSocket implements SocketIF {
                     // cancel any previous timeout
                     toWorker.cancel(timeout);
                 }
-                logger.log(Level.FINEST, "{0} OK",
+                LOGGER.log(Level.FINEST, "{0} OK",
                         sc.socket().getRemoteSocketAddress());
                 break;
         }
@@ -549,35 +562,39 @@ public final class SecureSocket implements SocketIF {
         //System.out.println("decryptedOut capacity " + decryptedOut.capacity());
 
         int pos = decryptedOut.position();
+        LOGGER.log(Level.FINEST, "encryptedOut before clear pos {0} lim {1} cap {2}",
+                new Object[]{encryptedOut.position(), encryptedOut.limit(), encryptedOut.capacity()});
         encryptedOut.clear();
         // Wrap the data to be written
         decryptedOut.flip();
         result = engine.wrap(decryptedOut, encryptedOut);
+        LOGGER.log(Level.FINEST, "encryptedOut after wrap pos {0} lim {1} cap {2}",
+                new Object[]{encryptedOut.position(), encryptedOut.limit(), encryptedOut.capacity()});
         decryptedOut.compact();
         // Process the engineResult.Status
         switch (result.getStatus()) {
             case BUFFER_UNDERFLOW:
-                logger.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_UNDERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 // This shouldn't happen as we only call write() when there is
                 // data to be written, throw an exception that will be handled
                 // in the application layer.
                 throw new BufferUnderflowException();
             case BUFFER_OVERFLOW:
-                logger.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
+                LOGGER.log(Level.FINEST, "{0} BUFFER_OVERFLOW",
                         sc.socket().getRemoteSocketAddress());
                 // This shouldn't happen if we flush data that has been wrapped
                 // as we do in this implementation, throw an exception that will
                 // be handled in the application layer.
                 throw new BufferOverflowException();
             case CLOSED:
-                logger.log(Level.FINEST, "{0} CLOSED",
+                LOGGER.log(Level.FINEST, "{0} CLOSED",
                         sc.socket().getRemoteSocketAddress());
                 // Trying to write on a closed SSLEngine, throw an exception
                 // that will be handled in the application layer.
                 throw new SSLException("SSLEngine is CLOSED");
             case OK:
-                logger.log(Level.FINEST, "{0} OK",
+                LOGGER.log(Level.FINEST, "{0} OK",
                         sc.socket().getRemoteSocketAddress());
                 // Everything is good, everything is fine.
                 break;
@@ -605,61 +622,61 @@ public final class SecureSocket implements SocketIF {
     private int flush() throws IOException {
         // Selector temp = null;
         encryptedOut.flip();
-        int remaining = encryptedOut.remaining();
+        //int remaining = encryptedOut.remaining();
         //System.out.println("Encrypted out remaining: " + remaining);
         int countOut = 0;
         int count;
         int retries = 0;
-        
-        while(encryptedOut.hasRemaining()){
+
+        while (encryptedOut.hasRemaining()) {
             count = sc.write(encryptedOut);
             countOut += count;
             retries++;
         }
         /*
-        while (encryptedOut.hasRemaining()) {
-            count = sc.write(encryptedOut);
-            countOut += count;
-            retries++;
-            //System.out.println(sc.socket().getLocalPort()
-            //    + ":" + sc.socket().getPort() + " Flushed " + count + " bytes");
-            if (count < 0) {
-                throw new IOException("EOF during flush");
-            }
+         while (encryptedOut.hasRemaining()) {
+         count = sc.write(encryptedOut);
+         countOut += count;
+         retries++;
+         //System.out.println(sc.socket().getLocalPort()
+         //    + ":" + sc.socket().getPort() + " Flushed " + count + " bytes");
+         if (count < 0) {
+         throw new IOException("EOF during flush");
+         }
 
-            if (count == 0) {
-                // write channel full.  Try letting other threads have a go.
-                Thread.yield();
-                count = sc.write(encryptedOut);
-                countOut += count;
-                retries++;
-                if (count < 0) {
-                    throw new IOException("EOF during flush");
-                }
+         if (count == 0) {
+         // write channel full.  Try letting other threads have a go.
+         Thread.yield();
+         count = sc.write(encryptedOut);
+         countOut += count;
+         retries++;
+         if (count < 0) {
+         throw new IOException("EOF during flush");
+         }
 
-                if (count == 0) {
-                    // still full.  need to  block until it is writable.
-                    // TODO: implement a selector pull to handle this write
-                    while (encryptedOut.hasRemaining()) {
-                        count = sc.write(encryptedOut);
-                        countOut += count;
-                        retries++;
-                    }
-                    temp = Selector.open();
-                    getSocket().register(temp, SelectionKey.OP_WRITE);
-                    temp.select();
-                }
-            }
-        }
-        if (temp != null) {
-            temp.close();
-            temp = null;
-        }
-        */
+         if (count == 0) {
+         // still full.  need to  block until it is writable.
+         // TODO: implement a selector pull to handle this write
+         while (encryptedOut.hasRemaining()) {
+         count = sc.write(encryptedOut);
+         countOut += count;
+         retries++;
+         }
+         temp = Selector.open();
+         getSocket().register(temp, SelectionKey.OP_WRITE);
+         temp.select();
+         }
+         }
+         }
+         if (temp != null) {
+         temp.close();
+         temp = null;
+         }
+         */
         encryptedOut.compact();
 
 
-        logger.log(Level.FINEST, "{0} Flushed {1} bytes, {2} retries.",
+        LOGGER.log(Level.FINEST, "{0} Flushed {1} bytes, {2} retries.",
                 new Object[]{sc.socket().getRemoteSocketAddress(),
                     countOut, retries <= 1 ? 0 : retries});
         return countOut;

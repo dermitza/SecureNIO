@@ -28,22 +28,23 @@ import java.util.logging.Logger;
  * appropriate formatting for them.
  * 
  * @author K. Dermitzakis
- * @version 0.19
+ * @version 0.20
  * @since   0.19
  */
 public class LoggerHandler {
 
-    private static final Logger top = Logger.getLogger("SecureNIO");
+    private static final Logger TOP = Logger.getLogger("SecureNIO");
 
     static {
-        Handler[] handlers = top.getHandlers();
+        TOP.setUseParentHandlers(false);
+        Handler[] handlers = TOP.getHandlers();
         for (Handler handler : handlers) {
-            top.removeHandler(handler);
+            TOP.removeHandler(handler);
         }
         MiniFormatter formatter = new MiniFormatter();
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(formatter);
-        top.addHandler(consoleHandler);
+        TOP.addHandler(consoleHandler);
     }
     
     /**
@@ -55,7 +56,7 @@ public class LoggerHandler {
      */
     public static Logger getLogger(String name){
         Logger l = Logger.getLogger(name);
-        l.setParent(top);
+        l.setParent(TOP);
         return Logger.getLogger(name);
     }
     
@@ -66,8 +67,8 @@ public class LoggerHandler {
      * @param level The {@link Level} to set the loggers to
      */
     public static void setLevel(Level level){
-        top.setLevel(level);
-        Handler[] handlers = top.getHandlers();
+        TOP.setLevel(level);
+        Handler[] handlers = TOP.getHandlers();
         // Publish changes to handlers
         for(Handler handler: handlers){
             handler.setLevel(level);
