@@ -39,7 +39,7 @@ import javax.net.ssl.SSLEngine;
  * {@link SecureSocket}s.
  *
  * @author K. Dermitzakis
- * @version 0.20
+ * @version 0.21
  * @since 0.18
  */
 public class TCPServer extends AbstractSelector implements SenderIF{
@@ -99,7 +99,6 @@ public class TCPServer extends AbstractSelector implements SenderIF{
         // Bind the server socket to the specified address and port
         LOGGER.log(Level.CONFIG, "Binding ServerSocket to *:{0}", port);
         InetSocketAddress isa = new InetSocketAddress(address, port);
-        //ssc.socket().setReuseAddress(true);
         ssc.socket().bind(isa, PropertiesReader.getBacklog());
 
         // Register the server socket channel, indicating an interest in 
@@ -180,5 +179,26 @@ public class TCPServer extends AbstractSelector implements SenderIF{
     @Override
     protected void connect(SelectionKey key) {
         throw new NoSuchMethodError("connect() is never called in client");
+    }
+    
+    @Override
+    protected void shutdown(){
+        LOGGER.log(Level.INFO, "Closing the server socket");
+        // First close the server socket.
+        try{
+            ssc.close();
+        }catch(IOException ioe){
+            LOGGER.log(Level.INFO, "IOE while closing the server socket", ioe);
+        }
+     
+        //TODO 
+        // That's all very well but why interrupt existing connections at all?
+        // What you should really do is close the ServerSocket, so there are no
+        // new connections, and then keep selecting until there are no more
+        // registered keys, which will happen automatically as clients close
+        // their connections or you time them out and close them yourself.
+
+        // Now shutdown normally
+        super.shutdown();
     }
 }

@@ -218,3 +218,6 @@ pip-log.txt
 /lib/
 /nbproject/
 /nbdist/
+/.gradle/
+.nb-gradle/
+.nb-gradle-properties

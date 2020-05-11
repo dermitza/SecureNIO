@@ -18,9 +18,10 @@
 package ch.dermitza.securenio.util;
 
 import ch.dermitza.securenio.util.logging.LoggerHandler;
-import java.io.FileInputStream;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,18 +32,19 @@ import java.util.logging.Logger;
  * the options set, please look at the supplied setup.properties.
  *
  * @author K. Dermitzakis
- * @version 0.20
+ * @version 0.21
  * @since 0.19
  */
 public class PropertiesReader {
 
     private static final Logger LOGGER = LoggerHandler.getLogger(PropertiesReader.class.getName());
-    private static final String SETTINGS_LOC = "setup.properjties";
+    private static final String SETTINGS_LOC = "setup.properties";
     private static final Properties PROPS = new Properties();
 
     static {
-        try (FileInputStream fis = new FileInputStream(SETTINGS_LOC)) {
-            PROPS.load(fis);
+        try (InputStream is = PropertiesReader.class.getClassLoader()
+                .getResourceAsStream(SETTINGS_LOC)) {
+            PROPS.load(is);
         } catch (FileNotFoundException ex) {
             LOGGER.log(Level.SEVERE, "Properties file not found, exiting", ex);
             System.exit(-1);

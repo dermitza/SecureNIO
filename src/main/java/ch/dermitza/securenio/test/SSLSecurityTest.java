@@ -17,7 +17,6 @@
  */
 package ch.dermitza.securenio.test;
 
-import java.io.FileInputStream;
 import java.security.KeyStore;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -26,7 +25,8 @@ import javax.net.ssl.TrustManagerFactory;
 /**
  *
  * @author K. Dermitzakis
- * @version 0.18
+ * @version 0.19
+ * @since 0.18
  */
 public class SSLSecurityTest {
 
@@ -36,8 +36,9 @@ public class SSLSecurityTest {
         char[] passphrase = "server".toCharArray();
 
         KeyStore ks = KeyStore.getInstance("JKS");
-        //ks.load(new FileInputStream("test.jks"), passphrase);
-        ks.load(new FileInputStream("server.jks"), passphrase);
+        ks.load(
+                SSLSecurityTest.class.getClassLoader()
+                        .getResourceAsStream("server.jks"), passphrase);
 
         //System.err.println("Loaded keystore");
         SSLContext context = SSLContext.getInstance("TLS");
